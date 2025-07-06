@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 // import { logActivity, extractRequestInfo } from '@/lib/activity-logger'

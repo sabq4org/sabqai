@@ -38,13 +38,30 @@ export async function POST(request: NextRequest) {
     // تشفير كلمة المرور
     const hashedPassword = await hashPassword(password)
 
+    // البحث عن دور المستخدم الافتراضي
+    const defaultRole = await prisma.sabq_roles.findFirst({
+      where: {
+        OR: [
+          { name: 'user' },
+          { id: 'user-role-id' }
+        ]
+      }
+    })
+
+    if (!defaultRole) {
+      return NextResponse.json(
+        { error: 'لا يمكن العثور على دور المستخدم الافتراضي' },
+        { status: 500 }
+      )
+    }
+
     // إنشاء المستخدم
     const user = await prisma.sabq_users.create({
       data: {
         email,
         password: hashedPassword,
         name,
-        roleId: 'user-role', // الدور الافتراضي للمستخدم الجديد
+        roleId: defaultRole.id, // استخدام ID الدور الصحيح
       },
       include: {
         role: true, // جلب معلومات الدور
