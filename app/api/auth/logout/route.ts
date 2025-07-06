@@ -18,10 +18,10 @@ export async function POST(request: NextRequest) {
         // فك تشفير التوكن للحصول على معلومات المستخدم
         const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
         
-        // حذف جميع جلسات المستخدم - تم تعليقها مؤقتًا لأن الجدول غير موجود
-        // await prisma.sabq_sessions.deleteMany({
-        //   where: { userId: decoded.userId }
-        // })
+        // حذف جميع جلسات المستخدم
+        await prisma.sabq_sessions.deleteMany({
+          where: { userId: decoded.userId }
+        })
         
         // تسجيل خروج ناجح
         await logActivity({

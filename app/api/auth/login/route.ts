@@ -90,14 +90,14 @@ export async function POST(request: NextRequest) {
       { expiresIn: '7d' }
     )
     
-    // حفظ الجلسة في قاعدة البيانات - تم تعليقها مؤقتًا لأن الجدول غير موجود
-    // await prisma.sabq_sessions.create({
-    //   data: {
-    //     userId: user.id,
-    //     token: sessionToken,
-    //     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 أيام
-    //   }
-    // })
+    // حفظ الجلسة في قاعدة البيانات
+    await prisma.sabq_sessions.create({
+      data: {
+        userId: user.id,
+        token: sessionToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 أيام
+      }
+    })
     
     // تسجيل دخول ناجح
     // await logActivity({
