@@ -58,17 +58,21 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex bg-gray-50 min-h-screen" dir="rtl">
+    <div className="min-h-screen bg-gray-50" dir="rtl">
       {/* Sidebar - Fixed */}
-      <Sidebar />
+      <div className="fixed top-0 right-0 h-full z-30">
+        <Sidebar />
+      </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 mr-72">
+      <div className="mr-72">
         {/* Top Bar */}
-        <TopBar toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
+        <div className="sticky top-0 z-20">
+          <TopBar toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
+        </div>
 
         {/* Page Content */}
-        <main className="px-8 py-8">
+        <main className="min-h-screen">
           {children}
         </main>
       </div>

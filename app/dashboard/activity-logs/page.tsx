@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
-import ar from 'date-fns/locale/ar-SA'
+import { arSA } from 'date-fns/locale'
 
 interface ActivityLog {
   id: string
@@ -98,7 +98,7 @@ export default function ActivityLogsPage() {
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'dd MMM yyyy - HH:mm', { locale: ar })
+      return format(new Date(dateString), 'dd MMM yyyy - HH:mm', { locale: arSA })
     } catch {
       return dateString
     }

@@ -105,3 +105,23 @@ model sabq_activity_logs {
   @@index([action])
   @@index([createdAt])
 }
+
+model sabq_categories {
+  id            String   @id @default(uuid())
+  name          String
+  name_en       String?
+  slug          String   @unique
+  description   String?
+  color         String?
+  icon          String?
+  display_order Int      @default(0)
+  is_active     Boolean  @default(true)
+  parent_id     String?
+  metadata      Json?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@index([slug])
+  @@index([is_active])
+  @@index([display_order])
+}

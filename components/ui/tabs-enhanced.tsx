@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LucideIcon } from 'lucide-react';
-import { useDarkModeContext } from '@/contexts/DarkModeContext';
 
 export interface TabItem {
   id: string;
@@ -19,7 +18,23 @@ interface TabsEnhancedProps {
 }
 
 export function TabsEnhanced({ tabs, activeTab, onTabChange, className = '' }: TabsEnhancedProps) {
-  const { darkMode } = useDarkModeContext();
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    // تحميل إعدادات الوضع الليلي من localStorage
+    const checkDarkMode = () => {
+      const savedDarkMode = localStorage.getItem('darkMode');
+      setDarkMode(savedDarkMode === 'true');
+    };
+
+    checkDarkMode();
+    // الاستماع لتغييرات الوضع الليلي
+    window.addEventListener('storage', checkDarkMode);
+    
+    return () => {
+      window.removeEventListener('storage', checkDarkMode);
+    };
+  }, []);
 
   return (
     <div className={`rounded-2xl p-2 shadow-sm border mb-8 w-full transition-colors duration-300 ${

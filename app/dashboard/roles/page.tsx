@@ -212,9 +212,9 @@ export default function RolesPage() {
   )
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">إدارة الصلاحيات والأدوار</h1>
         <button
           onClick={() => {
@@ -229,7 +229,7 @@ export default function RolesPage() {
       </div>
 
       {/* Search Bar */}
-      <Card>
+      <Card className="mb-6">
         <div className="space-y-3">
           <div className="relative">
             <MagnifyingGlassIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />

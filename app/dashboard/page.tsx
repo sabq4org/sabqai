@@ -125,221 +125,223 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* رسالة الترحيب */}
-      <div className="bg-gradient-to-l from-blue-600 to-blue-500 rounded-2xl p-6 text-white shadow-xl">
-        <h1 className="text-3xl font-bold mb-2">
-          مرحباً بك، {userInfo?.name || 'المستخدم'} 👋
-        </h1>
-        <p className="text-blue-100">
-          إليك نظرة عامة على أداء منصتك اليوم
-        </p>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <DashboardCard
-          label="إجمالي المستخدمين"
-          value={stats.users.toLocaleString('ar-SA')}
-          percent={4.1}
-          icon={<Users className="w-6 h-6" />}
-          color="blue"
-        />
-        <DashboardCard
-          label="المقالات المنشورة"
-          value={stats.articles.toLocaleString('ar-SA')}
-          percent={2.7}
-          icon={<FileText className="w-6 h-6" />}
-          color="green"
-        />
-        <DashboardCard
-          label="المشاهدات اليوم"
-          value={stats.views.toLocaleString('ar-SA')}
-          percent={-1.2}
-          icon={<Eye className="w-6 h-6" />}
-          color="purple"
-        />
-        <DashboardCard
-          label="الإيرادات"
-          value={`$${stats.revenue.toLocaleString('ar-SA')}`}
-          percent={8.5}
-          icon={<DollarSign className="w-6 h-6" />}
-          color="orange"
-        />
-      </div>
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Activity Chart */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">نشاط المنصة</h3>
-            <select className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>آخر 7 أيام</option>
-              <option>آخر 30 يوم</option>
-              <option>آخر 3 شهور</option>
-            </select>
-          </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={activityData}>
-              <defs>
-                <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Area 
-                type="monotone" 
-                dataKey="views" 
-                stroke="#3B82F6" 
-                fillOpacity={1} 
-                fill="url(#colorViews)" 
-                strokeWidth={2}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+    <div className="p-8">
+      <div className="space-y-6 animate-fade-in">
+        {/* رسالة الترحيب */}
+        <div className="bg-gradient-to-l from-blue-600 to-blue-500 rounded-2xl p-6 text-white shadow-xl">
+          <h1 className="text-3xl font-bold mb-2">
+            مرحباً بك، {userInfo?.name || 'المستخدم'} 👋
+          </h1>
+          <p className="text-blue-100">
+            إليك نظرة عامة على أداء منصتك اليوم
+          </p>
         </div>
 
-        {/* Categories Pie Chart */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">توزيع المقالات</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={categoryData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={5}
-                dataKey="value"
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <DashboardCard
+            label="إجمالي المستخدمين"
+            value={stats.users.toLocaleString('ar-SA')}
+            percent={4.1}
+            icon={<Users className="w-6 h-6" />}
+            color="blue"
+          />
+          <DashboardCard
+            label="المقالات المنشورة"
+            value={stats.articles.toLocaleString('ar-SA')}
+            percent={2.7}
+            icon={<FileText className="w-6 h-6" />}
+            color="green"
+          />
+          <DashboardCard
+            label="المشاهدات اليوم"
+            value={stats.views.toLocaleString('ar-SA')}
+            percent={-1.2}
+            icon={<Eye className="w-6 h-6" />}
+            color="purple"
+          />
+          <DashboardCard
+            label="الإيرادات"
+            value={`$${stats.revenue.toLocaleString('ar-SA')}`}
+            percent={8.5}
+            icon={<DollarSign className="w-6 h-6" />}
+            color="orange"
+          />
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Activity Chart */}
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">نشاط المنصة</h3>
+              <select className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option>آخر 7 أيام</option>
+                <option>آخر 30 يوم</option>
+                <option>آخر 3 شهور</option>
+              </select>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={activityData}>
+                <defs>
+                  <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Area 
+                  type="monotone" 
+                  dataKey="views" 
+                  stroke="#3B82F6" 
+                  fillOpacity={1} 
+                  fill="url(#colorViews)" 
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Categories Pie Chart */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">توزيع المقالات</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {categoryData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 space-y-2">
+              {categoryData.map((category) => (
+                <div key={category.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: category.color }}
+                    />
+                    <span className="text-sm text-gray-600">{category.name}</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">{category.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activities & Top Articles */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Activities */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">آخر الأنشطة</h3>
+            <div className="space-y-4">
+              {recentActivities.map((activity) => (
+                <div key={activity.id} className="flex items-start gap-4">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    activity.type === 'article' ? 'bg-blue-100' :
+                    activity.type === 'comment' ? 'bg-green-100' :
+                    activity.type === 'login' ? 'bg-purple-100' :
+                    'bg-orange-100'
+                  }`}>
+                    {activity.type === 'article' && <FileText className="w-5 h-5 text-blue-600" />}
+                    {activity.type === 'comment' && <Activity className="w-5 h-5 text-green-600" />}
+                    {activity.type === 'login' && <Users className="w-5 h-5 text-purple-600" />}
+                    {activity.type === 'profile' && <Users className="w-5 h-5 text-orange-600" />}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-900">
+                      <span className="font-medium">{activity.user}</span>
+                      {' '}
+                      {activity.action}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Performance Metrics */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">مؤشرات الأداء</h3>
+            <div className="space-y-6">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600">معدل النشر اليومي</span>
+                  <span className="text-sm font-medium text-gray-900">85%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: '85%' }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600">تفاعل المستخدمين</span>
+                  <span className="text-sm font-medium text-gray-900">72%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-green-500 h-2 rounded-full" style={{ width: '72%' }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600">جودة المحتوى</span>
+                  <span className="text-sm font-medium text-gray-900">93%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-purple-500 h-2 rounded-full" style={{ width: '93%' }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600">سرعة الاستجابة</span>
+                  <span className="text-sm font-medium text-gray-900">98%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-orange-500 h-2 rounded-full" style={{ width: '98%' }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* الروابط السريعة */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { title: 'إضافة مقال', icon: DocumentTextIcon, href: '/dashboard/articles/new', color: 'bg-blue-500' },
+            { title: 'إدارة المستخدمين', icon: UsersIcon, href: '/dashboard/users', color: 'bg-green-500' },
+            { title: 'الإحصائيات', icon: ChartBarIcon, href: '/dashboard/analytics', color: 'bg-purple-500' },
+            { title: 'الإعدادات', icon: CogIcon, href: '/dashboard/settings', color: 'bg-gray-500' },
+          ].map((link, index) => {
+            const Icon = link.icon
+            return (
+              <button
+                key={index}
+                onClick={() => router.push(link.href)}
+                className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-center group"
               >
-                {categoryData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="mt-4 space-y-2">
-            {categoryData.map((category) => (
-              <div key={category.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: category.color }}
-                  />
-                  <span className="text-sm text-gray-600">{category.name}</span>
+                <div className={`${link.color} w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+                  <Icon className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-sm font-medium text-gray-900">{category.value}</span>
-              </div>
-            ))}
-          </div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{link.title}</p>
+              </button>
+            )
+          })}
         </div>
-      </div>
-
-      {/* Recent Activities & Top Articles */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activities */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">آخر الأنشطة</h3>
-          <div className="space-y-4">
-            {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-start gap-4">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  activity.type === 'article' ? 'bg-blue-100' :
-                  activity.type === 'comment' ? 'bg-green-100' :
-                  activity.type === 'login' ? 'bg-purple-100' :
-                  'bg-orange-100'
-                }`}>
-                  {activity.type === 'article' && <FileText className="w-5 h-5 text-blue-600" />}
-                  {activity.type === 'comment' && <Activity className="w-5 h-5 text-green-600" />}
-                  {activity.type === 'login' && <Users className="w-5 h-5 text-purple-600" />}
-                  {activity.type === 'profile' && <Users className="w-5 h-5 text-orange-600" />}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900">
-                    <span className="font-medium">{activity.user}</span>
-                    {' '}
-                    {activity.action}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Performance Metrics */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">مؤشرات الأداء</h3>
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">معدل النشر اليومي</span>
-                <span className="text-sm font-medium text-gray-900">85%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '85%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">تفاعل المستخدمين</span>
-                <span className="text-sm font-medium text-gray-900">72%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{ width: '72%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">جودة المحتوى</span>
-                <span className="text-sm font-medium text-gray-900">93%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-purple-500 h-2 rounded-full" style={{ width: '93%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">سرعة الاستجابة</span>
-                <span className="text-sm font-medium text-gray-900">98%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-orange-500 h-2 rounded-full" style={{ width: '98%' }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* الروابط السريعة */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { title: 'إضافة مقال', icon: DocumentTextIcon, href: '/dashboard/articles/new', color: 'bg-blue-500' },
-          { title: 'إدارة المستخدمين', icon: UsersIcon, href: '/dashboard/users', color: 'bg-green-500' },
-          { title: 'الإحصائيات', icon: ChartBarIcon, href: '/dashboard/analytics', color: 'bg-purple-500' },
-          { title: 'الإعدادات', icon: CogIcon, href: '/dashboard/settings', color: 'bg-gray-500' },
-        ].map((link, index) => {
-          const Icon = link.icon
-          return (
-            <button
-              key={index}
-              onClick={() => router.push(link.href)}
-              className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-center group"
-            >
-              <div className={`${link.color} w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
-                <Icon className="w-6 h-6 text-white" />
-              </div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{link.title}</p>
-            </button>
-          )
-        })}
       </div>
     </div>
   )
