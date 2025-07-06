@@ -5,7 +5,7 @@ import { hashPassword } from '@/lib/auth'
 // GET - جلب كل المستخدمين
 export async function GET() {
   try {
-    const users = await prisma.sabqUser.findMany({
+    const users = await prisma.sabq_users.findMany({
       select: {
         id: true,
         email: true,
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // التحقق من وجود المستخدم
-    const existingUser = await prisma.sabqUser.findUnique({
+    const existingUser = await prisma.sabq_users.findUnique({
       where: { email },
     })
 
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hashPassword(password)
 
     // إنشاء المستخدم
-    const user = await prisma.sabqUser.create({
+    const user = await prisma.sabq_users.create({
       data: {
         email,
         password: hashedPassword,

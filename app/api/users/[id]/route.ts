@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     const params = await context.params
-    const user = await prisma.sabqUser.findUnique({
+    const user = await prisma.sabq_users.findUnique({
       where: { id: params.id },
       select: {
         id: true,
@@ -49,7 +49,7 @@ export async function PUT(
     const { email, password, name, role } = body
 
     // التحقق من وجود المستخدم
-    const existingUser = await prisma.sabqUser.findUnique({
+    const existingUser = await prisma.sabq_users.findUnique({
       where: { id: params.id },
     })
 
@@ -70,7 +70,7 @@ export async function PUT(
     }
 
     // تحديث المستخدم
-    const user = await prisma.sabqUser.update({
+    const user = await prisma.sabq_users.update({
       where: { id: params.id },
       data: updateData,
       select: {
@@ -102,7 +102,7 @@ export async function DELETE(
     const params = await context.params
     
     // التحقق من وجود المستخدم
-    const existingUser = await prisma.sabqUser.findUnique({
+    const existingUser = await prisma.sabq_users.findUnique({
       where: { id: params.id },
     })
 
@@ -114,7 +114,7 @@ export async function DELETE(
     }
 
     // حذف المستخدم
-    await prisma.sabqUser.delete({
+    await prisma.sabq_users.delete({
       where: { id: params.id },
     })
 

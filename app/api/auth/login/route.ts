@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     // البحث عن المستخدم
-    const user = await prisma.sabqUser.findUnique({
+    const user = await prisma.sabq_users.findUnique({
       where: { email },
     })
 

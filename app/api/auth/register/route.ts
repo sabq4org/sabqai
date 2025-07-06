@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // التحقق من وجود المستخدم
-    const existingUser = await prisma.sabqUser.findUnique({
+    const existingUser = await prisma.sabq_users.findUnique({
       where: { email },
     })
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hashPassword(password)
 
     // إنشاء المستخدم
-    const user = await prisma.sabqUser.create({
+    const user = await prisma.sabq_users.create({
       data: {
         email,
         password: hashedPassword,
