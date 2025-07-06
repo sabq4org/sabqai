@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requirePermission } from '@/lib/auth/permissions'
-import { getActivityLogs } from '@/lib/activity-logger'
+// import { getActivityLogs } from '@/lib/activity-logger'
 
 export async function GET(request: NextRequest) {
   try {
     // التحقق من صلاحية system.view
     const authCheck = await requirePermission(request, 'system', 'view')
-    if (!authCheck.authorized) {
-      return NextResponse.json(
-        { error: authCheck.error },
-        { status: 401 }
-      )
+    if (authCheck) {
+      return authCheck // إذا كان هناك خطأ، أعد الاستجابة مباشرة
     }
 
     // جلب المعاملات من الطلب
@@ -21,15 +18,15 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    // جلب السجلات
-    const result = await getActivityLogs({
-      action: action as any,
-      userId,
-      limit,
-      offset
-    })
+    // جلب السجلات - مؤقتًا نعيد بيانات فارغة
+    // const result = await getActivityLogs({
+    //   action: action as any,
+    //   userId,
+    //   limit,
+    //   offset
+    // })
 
-    return NextResponse.json(result)
+    return NextResponse.json({ logs: [], total: 0 })
   } catch (error) {
     console.error('Error fetching activity logs:', error)
     return NextResponse.json(
