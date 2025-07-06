@@ -10,6 +10,9 @@
     "postinstall": "prisma generate",
     "prisma:migrate": "prisma migrate deploy"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@prisma/client": "^6.11.1",
     "bcrypt": "^6.0.0",

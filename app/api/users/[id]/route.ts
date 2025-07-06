@@ -5,9 +5,10 @@ import { hashPassword } from '@/lib/auth'
 // GET - جلب مستخدم محدد
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params
     const user = await prisma.sabqUser.findUnique({
       where: { id: params.id },
       select: {
@@ -40,9 +41,10 @@ export async function GET(
 // PUT - تحديث مستخدم
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params
     const body = await request.json()
     const { email, password, name, role } = body
 
@@ -94,9 +96,11 @@ export async function PUT(
 // DELETE - حذف مستخدم
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params
+    
     // التحقق من وجود المستخدم
     const existingUser = await prisma.sabqUser.findUnique({
       where: { id: params.id },
