@@ -44,6 +44,10 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         name,
+        roleId: 'user-role', // الدور الافتراضي للمستخدم الجديد
+      },
+      include: {
+        role: true, // جلب معلومات الدور
       },
     })
 
@@ -56,7 +60,8 @@ export async function POST(request: NextRequest) {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role,
+        role: user.role?.nameAr || 'مستخدم', // استخدام اسم الدور العربي
+        permissions: [], // يمكن إضافة الصلاحيات لاحقاً إذا لزم الأمر
       },
       token,
     }, { status: 201 })

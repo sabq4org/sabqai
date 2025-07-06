@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import UserEditForm from './UserEditForm'
 
 interface User {
   id: string
@@ -20,6 +21,7 @@ export default function UserList() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [editingUserId, setEditingUserId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchUsers()
@@ -70,12 +72,28 @@ export default function UserList() {
     }
   }
 
+  const handleEditSuccess = () => {
+    setEditingUserId(null)
+    fetchUsers() // إعادة جلب البيانات
+  }
+
   if (loading) {
     return <div className="text-center p-4">جاري التحميل...</div>
   }
 
   if (error) {
     return <div className="text-red-500 text-center p-4">{error}</div>
+  }
+
+  // إذا كان هناك مستخدم يتم تعديله، أظهر نموذج التعديل
+  if (editingUserId) {
+    return (
+      <UserEditForm
+        userId={editingUserId}
+        onSuccess={handleEditSuccess}
+        onCancel={() => setEditingUserId(null)}
+      />
+    )
   }
 
   return (
@@ -116,12 +134,20 @@ export default function UserList() {
                     {new Date(user.createdAt).toLocaleDateString('ar')}
                   </td>
                   <td className="px-4 py-2 border-b">
-                    <button
-                      onClick={() => handleDelete(user.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      حذف
-                    </button>
+                    <div className="flex gap-2 justify-center">
+                      <button
+                        onClick={() => setEditingUserId(user.id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        تعديل
+                      </button>
+                      <button
+                        onClick={() => handleDelete(user.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        حذف
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

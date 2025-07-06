@@ -66,6 +66,40 @@ export default function DashboardPage() {
     setRefreshKey(prev => prev + 1)
   }
 
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      
+      // استدعاء API تسجيل الخروج
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      })
+
+      if (response.ok) {
+        // حذف البيانات من localStorage
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        
+        // إعادة التوجيه لصفحة تسجيل الدخول مع رسالة النجاح
+        router.push('/login?logout=true')
+      } else {
+        // حتى لو فشل الطلب، نقوم بتسجيل الخروج محلياً
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        router.push('/login?logout=true')
+      }
+    } catch (error) {
+      console.error('خطأ في تسجيل الخروج:', error)
+      // تسجيل خروج محلي في حالة الخطأ
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      router.push('/login?logout=true')
+    }
+  }
+
   // التحقق من صلاحية إدارة المستخدمين
   const canManageUsers = userInfo?.permissions?.some(
     p => p.resource === 'users' && (p.action === 'create' || p.action === 'read')
@@ -81,10 +115,31 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
+      {/* شريط علوي مع زر تسجيل الخروج */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-800">لوحة التحكم - سبق</h1>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+          >
+            تسجيل الخروج
+          </button>
+        </div>
+      </div>
+
       <div className="container mx-auto py-8 px-4">
         {/* معلومات المستخدم الحالي */}
         <div className="bg-white rounded-lg shadow-md mb-8 p-6">
-          <h2 className="text-xl font-bold mb-4">معلومات الحساب</h2>
+          <div className="flex justify-between items-start mb-4">
+            <h2 className="text-xl font-bold">معلومات الحساب</h2>
+            <button
+              onClick={() => router.push('/dashboard/profile')}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm"
+            >
+              تعديل الملف الشخصي
+            </button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-gray-600">الاسم:</p>
@@ -123,8 +178,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold mb-8 text-center">لوحة التحكم</h1>
-        
         {/* قسم إدارة المستخدمين - يظهر فقط لمن لديه الصلاحية */}
         {canManageUsers ? (
           <>
