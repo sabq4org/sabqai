@@ -58,29 +58,37 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
-      {/* Sidebar - Fixed */}
-      <div className="fixed top-0 right-0 h-full z-30">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200" dir="rtl">
+      {/* Sidebar - Fixed for desktop, drawer for mobile */}
+      <div className={`fixed top-0 right-0 h-full z-30 transition-transform duration-300 ${
+        isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
+      }`}>
         <Sidebar />
       </div>
 
       {/* Main Content Area */}
-      <div className="mr-72">
+      <div className="lg:mr-72">
         {/* Top Bar */}
         <div className="sticky top-0 z-20">
-          <TopBar toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
+          <TopBar 
+            toggleDarkMode={toggleDarkMode} 
+            isDarkMode={isDarkMode}
+            toggleSidebar={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          />
         </div>
 
         {/* Page Content */}
-        <main className="min-h-screen">
-          {children}
+        <main className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+          <div className="p-6">
+            {children}
+          </div>
         </main>
       </div>
 
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}

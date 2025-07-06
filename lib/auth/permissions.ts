@@ -1,6 +1,9 @@
 import { PrismaClient } from '@prisma/client'
+import { NextResponse } from 'next/server'
+import jwt from 'jsonwebtoken'
 
 const prisma = new PrismaClient()
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
 // أنواع الصلاحيات
 export interface Permission {
@@ -131,12 +134,39 @@ export async function requirePermission(
   request: Request,
   resource: string,
   action: string
-): Promise<any> {
+): Promise<NextResponse | null> {
   try {
-    // هنا يمكن إضافة منطق التحقق من الصلاحيات
-    // حالياً سنسمح بكل الطلبات
-    return { authorized: true }
+    // استخراج التوكن من الهيدر
+    const authHeader = request.headers.get('authorization')
+    const token = authHeader?.replace('Bearer ', '')
+
+    if (!token) {
+      return NextResponse.json(
+        { error: 'غير مصرح' },
+        { status: 401 }
+      )
+    }
+
+    // فك تشفير التوكن
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
+    
+    // التحقق من الصلاحية
+    const hasPermission = await checkUserPermission(decoded.userId, resource, action)
+    
+    if (!hasPermission) {
+      return NextResponse.json(
+        { error: 'ليس لديك الصلاحية للقيام بهذا الإجراء' },
+        { status: 403 }
+      )
+    }
+
+    // إذا كان لديه الصلاحية، نعيد null للسماح بالمتابعة
+    return null
   } catch (error) {
-    return { authorized: false, error: 'خطأ في التحقق من الصلاحيات' }
+    console.error('خطأ في التحقق من الصلاحيات:', error)
+    return NextResponse.json(
+      { error: 'خطأ في التحقق من الصلاحيات' },
+      { status: 500 }
+    )
   }
 } 

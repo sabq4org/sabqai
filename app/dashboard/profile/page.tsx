@@ -1,282 +1,200 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-
-interface UserProfile {
-  id: string
-  email: string
-  name: string | null
-  role: {
-    id: string
-    name: string
-    nameAr: string
-  } | null
-}
+import { User, Mail, Calendar, Shield, Save, Camera } from 'lucide-react'
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState({ type: '', text: '' })
-  
-  // حقول النموذج
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPasswordFields, setShowPasswordFields] = useState(false)
-  
-  const router = useRouter()
+  const [userInfo, setUserInfo] = useState<any>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: ''
+  })
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    fetchProfile()
+    // جلب معلومات المستخدم من localStorage
+    const userData = localStorage.getItem('user')
+    if (userData) {
+      const user = JSON.parse(userData)
+      setUserInfo(user)
+      setFormData({
+        name: user.name || '',
+        email: user.email || ''
+      })
+    }
   }, [])
 
-  const fetchProfile = async () => {
+  const handleSave = async () => {
+    setIsLoading(true)
     try {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        router.push('/login')
-        return
-      }
-
-      const response = await fetch('/api/user/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setProfile(data.user)
-        setName(data.user.name || '')
-        setEmail(data.user.email)
-      } else if (response.status === 401) {
-        router.push('/login')
-      } else {
-        const data = await response.json()
-        setMessage({ type: 'error', text: data.error || 'حدث خطأ في جلب البيانات' })
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'حدث خطأ في الاتصال بالخادم' })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    // التحقق من تطابق كلمة المرور الجديدة
-    if (newPassword && newPassword !== confirmPassword) {
-      setMessage({ type: 'error', text: 'كلمة المرور الجديدة غير متطابقة' })
-      return
-    }
-
-    setSaving(true)
-    setMessage({ type: '', text: '' })
-
-    try {
-      const token = localStorage.getItem('token')
-      const updateData: any = { name, email }
-      
-      if (newPassword) {
-        updateData.currentPassword = currentPassword
-        updateData.newPassword = newPassword
-      }
-
-      const response = await fetch('/api/user/profile', {
+      const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(formData)
       })
 
-      const data = await response.json()
-
       if (response.ok) {
-        setMessage({ type: 'success', text: data.message || 'تم تحديث البيانات بنجاح' })
-        
-        // تحديث البيانات المحلية
-        if (data.user) {
-          setProfile(data.user)
-          const userData = JSON.parse(localStorage.getItem('user') || '{}')
-          localStorage.setItem('user', JSON.stringify({
-            ...userData,
-            ...data.user
-          }))
-        }
-
-        // مسح حقول كلمة المرور
-        setCurrentPassword('')
-        setNewPassword('')
-        setConfirmPassword('')
-        setShowPasswordFields(false)
-      } else {
-        setMessage({ type: 'error', text: data.error || 'حدث خطأ في تحديث البيانات' })
+        const updatedUser = await response.json()
+        localStorage.setItem('user', JSON.stringify(updatedUser))
+        setUserInfo(updatedUser)
+        setIsEditing(false)
+        alert('تم حفظ التغييرات بنجاح')
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'حدث خطأ في الاتصال بالخادم' })
+      console.error('خطأ في حفظ البيانات:', error)
+      alert('حدث خطأ في حفظ البيانات')
     } finally {
-      setSaving(false)
+      setIsLoading(false)
     }
   }
 
-  if (loading) {
+  if (!userInfo) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">جاري التحميل...</div>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
-      {/* شريط علوي */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-800">تعديل الملف الشخصي</h1>
+    <div className="max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">الملف الشخصي</h1>
           <button
-            onClick={() => router.push('/dashboard')}
-            className="text-gray-600 hover:text-gray-800"
+            onClick={() => setIsEditing(!isEditing)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            العودة للوحة التحكم
+            {isEditing ? 'إلغاء' : 'تعديل'}
           </button>
+        </div>
+
+        {/* Profile Image & Basic Info */}
+        <div className="flex items-center gap-6">
+          <div className="relative">
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+              <User className="w-12 h-12 text-white" />
+            </div>
+            {isEditing && (
+              <button className="absolute bottom-0 left-0 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center">
+                <Camera className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex-1">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{userInfo.name}</h2>
+            <p className="text-gray-500 dark:text-gray-400">{userInfo.email}</p>
+            <div className="flex items-center gap-4 mt-2">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm">
+                <Shield className="w-3 h-3" />
+                {userInfo.role?.nameAr || 'مستخدم'}
+              </span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                <Calendar className="w-3 h-3 inline ml-1" />
+                عضو منذ {new Date(userInfo.createdAt).toLocaleDateString('ar')}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="container mx-auto py-8 px-4 max-w-2xl">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          {/* رسائل النجاح/الخطأ */}
-          {message.text && (
-            <div className={`mb-4 p-4 rounded ${
-              message.type === 'success' 
-                ? 'bg-green-100 border border-green-400 text-green-700' 
-                : 'bg-red-100 border border-red-400 text-red-700'
-            }`}>
-              {message.text}
-            </div>
-          )}
-
-          {/* معلومات الحساب */}
-          <div className="mb-6 p-4 bg-gray-50 rounded">
-            <div className="text-sm text-gray-600">
-              <p><strong>معرف الحساب:</strong> {profile?.id}</p>
-              <p><strong>الدور:</strong> {profile?.role?.nameAr || 'غير محدد'}</p>
-            </div>
+      {/* Profile Details */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">معلومات الحساب</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              الاسم الكامل
+            </label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            ) : (
+              <p className="text-gray-900 dark:text-white">{userInfo.name}</p>
+            )}
           </div>
 
-          {/* نموذج التعديل */}
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              {/* الاسم */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  الاسم
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="أدخل اسمك"
-                />
-              </div>
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              البريد الإلكتروني
+            </label>
+            {isEditing ? (
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                disabled
+              />
+            ) : (
+              <p className="text-gray-900 dark:text-white flex items-center gap-2">
+                <Mail className="w-4 h-4 text-gray-400" />
+                {userInfo.email}
+              </p>
+            )}
+          </div>
 
-              {/* البريد الإلكتروني */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  البريد الإلكتروني
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
 
-              {/* زر تغيير كلمة المرور */}
-              <div className="border-t pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowPasswordFields(!showPasswordFields)}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                >
-                  {showPasswordFields ? 'إلغاء تغيير كلمة المرور' : 'تغيير كلمة المرور'}
-                </button>
-              </div>
 
-              {/* حقول كلمة المرور */}
-              {showPasswordFields && (
-                <div className="space-y-4 border p-4 rounded bg-gray-50">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      كلمة المرور الحالية
-                    </label>
-                    <input
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      required={showPasswordFields}
-                    />
-                  </div>
+          {/* Role */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              الدور
+            </label>
+            <p className="text-gray-900 dark:text-white">
+              {userInfo.role?.nameAr || 'مستخدم'}
+            </p>
+          </div>
+        </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      كلمة المرور الجديدة
-                    </label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="6 أحرف على الأقل"
-                      required={showPasswordFields}
-                    />
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      تأكيد كلمة المرور الجديدة
-                    </label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      required={showPasswordFields}
-                    />
-                  </div>
-                </div>
+
+        {/* Save Button */}
+        {isEditing && (
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={handleSave}
+              disabled={isLoading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+            >
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              ) : (
+                <Save className="w-4 h-4" />
               )}
-            </div>
+              حفظ التغييرات
+            </button>
+          </div>
+        )}
+      </div>
 
-            {/* أزرار الإجراءات */}
-            <div className="mt-6 flex gap-4">
-              <button
-                type="submit"
-                disabled={saving}
-                className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => router.push('/dashboard')}
-                className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
-              >
-                إلغاء
-              </button>
-            </div>
-          </form>
+      {/* Security Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">الأمان</h3>
+        
+        <div className="space-y-4">
+          <button className="w-full text-right px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            <span className="font-medium text-gray-900 dark:text-white">تغيير كلمة المرور</span>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">قم بتحديث كلمة المرور الخاصة بك</p>
+          </button>
+
+          <button className="w-full text-right px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            <span className="font-medium text-gray-900 dark:text-white">المصادقة الثنائية</span>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">أضف طبقة حماية إضافية لحسابك</p>
+          </button>
         </div>
       </div>
     </div>
