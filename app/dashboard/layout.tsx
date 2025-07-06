@@ -28,7 +28,7 @@ export default function DashboardLayout({
     const savedDarkMode = localStorage.getItem('darkMode')
     if (savedDarkMode === 'true') {
       setIsDarkMode(true)
-      document.documentElement.classList.add('dark')
+      // لا حاجة لإضافة الكلاس هنا لأن ThemeProvider يتولى ذلك
     }
 
     setIsLoading(false)
