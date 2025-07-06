@@ -32,7 +32,8 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body
-        className={`${cairo.variable} ${geistSans.variable} ${geistMono.variable} antialiased font-cairo`}
+        className={`${cairo.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ fontFamily: 'var(--font-cairo)' }}
       >
         <ThemeProvider>
           {children}
