@@ -6,7 +6,6 @@ import {
   Search,
   Plus,
   User,
-  Settings,
   Sun,
   Moon,
   Menu,
@@ -115,10 +114,7 @@ export default function TopBar({ toggleDarkMode, isDarkMode, toggleSidebar }: To
               )}
             </button>
 
-            {/* Settings */}
-            <button className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center">
-              <Settings className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-            </button>
+
 
             {/* User Menu */}
             <div className="relative">
