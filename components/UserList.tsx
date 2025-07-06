@@ -6,7 +6,12 @@ interface User {
   id: string
   email: string
   name: string | null
-  role: string
+  role: {
+    id: string
+    name: string
+    nameAr: string
+  } | null
+  sessionsCount?: number
   createdAt: string
   updatedAt: string
 }
@@ -22,7 +27,12 @@ export default function UserList() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users')
+      const token = localStorage.getItem('token')
+      const response = await fetch('/api/admin/users', {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      })
       const data = await response.json()
       
       if (response.ok) {
@@ -41,8 +51,12 @@ export default function UserList() {
     if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return
 
     try {
-      const response = await fetch(`/api/users/${id}`, {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`/api/admin/users/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
       })
 
       if (response.ok) {
@@ -78,6 +92,7 @@ export default function UserList() {
                 <th className="px-4 py-2 border-b text-right">الاسم</th>
                 <th className="px-4 py-2 border-b text-right">البريد الإلكتروني</th>
                 <th className="px-4 py-2 border-b text-right">الدور</th>
+                <th className="px-4 py-2 border-b text-right">الجلسات النشطة</th>
                 <th className="px-4 py-2 border-b text-right">تاريخ الإنشاء</th>
                 <th className="px-4 py-2 border-b text-right">الإجراءات</th>
               </tr>
@@ -87,7 +102,16 @@ export default function UserList() {
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-4 py-2 border-b">{user.name || 'غير محدد'}</td>
                   <td className="px-4 py-2 border-b">{user.email}</td>
-                  <td className="px-4 py-2 border-b">{user.role}</td>
+                  <td className="px-4 py-2 border-b">
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
+                      {user.role?.nameAr || user.role?.name || 'مستخدم'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 border-b text-center">
+                    <span className="text-gray-600">
+                      {user.sessionsCount || 0}
+                    </span>
+                  </td>
                   <td className="px-4 py-2 border-b">
                     {new Date(user.createdAt).toLocaleDateString('ar')}
                   </td>

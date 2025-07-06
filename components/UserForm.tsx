@@ -1,9 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface UserFormProps {
   onSuccess?: () => void
+}
+
+interface Role {
+  id: string
+  name: string
+  nameAr: string
 }
 
 export default function UserForm({ onSuccess }: UserFormProps) {
@@ -11,10 +17,39 @@ export default function UserForm({ onSuccess }: UserFormProps) {
     email: '',
     password: '',
     name: '',
-    role: 'user'
+    roleId: 'user-role-id' // الدور الافتراضي
   })
+  const [roles, setRoles] = useState<Role[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    fetchRoles()
+  }, [])
+
+  const fetchRoles = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch('/api/admin/roles', {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setRoles(data.roles || [])
+      }
+    } catch (err) {
+      console.error('خطأ في جلب الأدوار:', err)
+      // استخدام قائمة افتراضية
+      setRoles([
+        { id: 'user-role-id', name: 'user', nameAr: 'مستخدم' },
+        { id: 'editor-role-id', name: 'editor', nameAr: 'محرر' },
+        { id: 'admin-role-id', name: 'admin', nameAr: 'مدير' }
+      ])
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,10 +57,12 @@ export default function UserForm({ onSuccess }: UserFormProps) {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/users', {
+      const token = localStorage.getItem('token')
+      const response = await fetch('/api/admin/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
         },
         body: JSON.stringify(formData),
       })
@@ -38,7 +75,7 @@ export default function UserForm({ onSuccess }: UserFormProps) {
           email: '',
           password: '',
           name: '',
-          role: 'user'
+          roleId: 'user-role-id'
         })
         
         if (onSuccess) onSuccess()
@@ -118,13 +155,16 @@ export default function UserForm({ onSuccess }: UserFormProps) {
             الدور
           </label>
           <select
-            name="role"
-            value={formData.role}
+            name="roleId"
+            value={formData.roleId}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-200"
           >
-            <option value="user">مستخدم</option>
-            <option value="admin">مدير</option>
+            {roles.map((role) => (
+              <option key={role.id} value={role.id}>
+                {role.nameAr || role.name}
+              </option>
+            ))}
           </select>
         </div>
 

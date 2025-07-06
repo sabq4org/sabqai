@@ -7,12 +7,81 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// جدول المستخدمين
 model sabq_users {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
   name      String?
-  role      String   @default("user")
+  roleId    String?  @default("user-role-id")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // العلاقات
+  role      sabq_roles? @relation(fields: [roleId], references: [id])
+  sessions  sabq_sessions[]
+}
+
+// جدول الأدوار
+model sabq_roles {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  nameAr      String   // الاسم بالعربية
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // العلاقات
+  users       sabq_users[]
+  permissions sabq_role_permissions[]
+}
+
+// جدول الصلاحيات
+model sabq_permissions {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  nameAr      String   // الاسم بالعربية
+  resource    String   // المورد (articles, users, etc)
+  action      String   // الإجراء (create, read, update, delete)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // العلاقات
+  roles       sabq_role_permissions[]
+  
+  @@unique([resource, action])
+}
+
+// جدول ربط الأدوار بالصلاحيات
+model sabq_role_permissions {
+  id           String   @id @default(uuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+  
+  // العلاقات
+  role         sabq_roles       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   sabq_permissions @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  @@unique([roleId, permissionId])
+}
+
+// جدول الجلسات (للأمان المتقدم)
+model sabq_sessions {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // العلاقات
+  user      sabq_users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([expiresAt])
 }
