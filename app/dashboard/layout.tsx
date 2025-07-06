@@ -44,6 +44,9 @@ export default function DashboardLayout({
     } else {
       document.documentElement.classList.remove('dark')
     }
+
+    // إطلاق حدث مخصص لتحديث ThemeProvider
+    window.dispatchEvent(new Event('theme-change'))
   }
 
   if (isLoading) {
