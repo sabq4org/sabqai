@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# سبق - منصة الأخبار الذكية
 
-## Getting Started
+منصة إخبارية حديثة مبنية بأحدث التقنيات مع نظام مصادقة متكامل.
 
-First, run the development server:
+## المميزات
+
+- ✅ نظام مصادقة كامل (تسجيل، دخول، JWT)
+- ✅ إدارة المستخدمين (CRUD)
+- ✅ قاعدة بيانات PostgreSQL مع Prisma ORM
+- ✅ واجهات مستخدم حديثة وسريعة
+- ✅ Next.js 15 مع App Router
+- ✅ TypeScript للأمان في الكتابة
+- ✅ Tailwind CSS للتصميم
+
+## المتطلبات
+
+- Node.js 18+ 
+- PostgreSQL (يمكن استخدام Supabase)
+- npm أو yarn
+
+## التثبيت
 
 ```bash
+# استنساخ المشروع
+git clone https://github.com/sabq4org/sabqai.git
+cd sabqai
+
+# تثبيت المكتبات
+npm install
+
+# إعداد قاعدة البيانات
+cp .env.example .env
+# قم بتعديل ملف .env وإضافة بيانات قاعدة البيانات
+
+# تشغيل migrations
+npx prisma migrate dev
+
+# تشغيل المشروع في وضع التطوير
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## البنية التقنية
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: PostgreSQL + Prisma ORM
+- **Authentication**: JWT
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## هيكل المشروع
 
-## Learn More
+```
+sabq/
+├── app/                    # صفحات التطبيق
+│   ├── api/               # API endpoints
+│   ├── dashboard/         # لوحة التحكم
+│   ├── login/            # صفحة تسجيل الدخول
+│   └── register/         # صفحة التسجيل
+├── components/            # المكونات
+├── lib/                   # المكتبات والأدوات
+├── prisma/               # مخطط قاعدة البيانات
+└── public/               # الملفات العامة
+```
 
-To learn more about Next.js, take a look at the following resources:
+## النشر
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/sabq4org/sabqai)
 
-## Deploy on Vercel
+### Digital Ocean
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. إنشاء App Platform app
+2. ربط GitHub repository
+3. إضافة متغيرات البيئة
+4. تشغيل build command: `npm run build`
+5. تشغيل start command: `npm start`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## المتغيرات البيئية
+
+```env
+DATABASE_URL=postgresql://...
+JWT_SECRET=your-secret-key
+NEXT_PUBLIC_SUPABASE_URL=https://...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+```
+
+## الرخصة
+
+MIT
+
+## المساهمة
+
+نرحب بالمساهمات! يرجى فتح issue أو pull request.
