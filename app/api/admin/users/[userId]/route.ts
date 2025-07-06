@@ -129,9 +129,10 @@ export async function DELETE(
   const authResult = await requirePermission(request, 'users', 'delete')
   if (authResult instanceof NextResponse) return authResult
   
+  const currentUser = authResult
+  
   try {
     const { userId } = await params
-    const user = authResult
 
     // التحقق من وجود المستخدم
     const userToDelete = await prisma.sabq_users.findUnique({
@@ -147,7 +148,7 @@ export async function DELETE(
     }
 
     // منع حذف المستخدم نفسه
-    if (userToDelete.id === user.id) {
+    if (userToDelete.id === currentUser.id) {
       return NextResponse.json(
         { success: false, error: 'لا يمكنك حذف حسابك الخاص' },
         { status: 400 }

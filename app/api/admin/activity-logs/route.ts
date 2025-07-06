@@ -6,10 +6,8 @@ import { requirePermission } from '@/lib/auth/permissions'
 export async function GET(request: NextRequest) {
   try {
     // التحقق من صلاحية system.view
-    const authCheck = await requirePermission(request, 'system', 'view')
-    if (authCheck) {
-      return authCheck // إذا كان هناك خطأ، أعد الاستجابة مباشرة
-    }
+    const authResult = await requirePermission(request, 'system', 'view')
+    if (authResult instanceof NextResponse) return authResult
 
     // جلب المعاملات من الطلب
     const searchParams = request.nextUrl.searchParams

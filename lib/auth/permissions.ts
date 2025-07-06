@@ -134,7 +134,7 @@ export async function requirePermission(
   request: Request,
   resource: string,
   action: string
-): Promise<NextResponse | null> {
+): Promise<NextResponse | { id: string; email: string; name: string | null; roleId: string | null }> {
   try {
     // استخراج التوكن من الهيدر
     const authHeader = request.headers.get('authorization')
@@ -160,8 +160,21 @@ export async function requirePermission(
       )
     }
 
-    // إذا كان لديه الصلاحية، نعيد null للسماح بالمتابعة
-    return null
+    // جلب معلومات المستخدم
+    const user = await prisma.sabq_users.findUnique({
+      where: { id: decoded.userId },
+      select: { id: true, email: true, name: true, roleId: true }
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'المستخدم غير موجود' },
+        { status: 401 }
+      )
+    }
+
+    // إذا كان لديه الصلاحية، نعيد معلومات المستخدم
+    return user
   } catch (error) {
     console.error('خطأ في التحقق من الصلاحيات:', error)
     return NextResponse.json(
