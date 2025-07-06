@@ -2,36 +2,93 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import UserList from '@/components/UserList'
-import UserForm from '@/components/UserForm'
+import {
+  ChartBarIcon,
+  DocumentTextIcon,
+  UsersIcon,
+  EyeIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+  ClockIcon,
+  FireIcon,
+  CogIcon
+} from '@heroicons/react/24/outline'
+import {
+  Users,
+  FileText,
+  Eye,
+  TrendingUp,
+  Activity,
+  DollarSign,
+  ShoppingCart,
+  Package
+} from 'lucide-react'
+import DashboardCard from '@/components/dashboard/DashboardCard'
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts'
 
-interface UserInfo {
-  id: string
-  email: string
-  name: string
-  role: {
-    id: string
-    name: string
-    nameAr: string
-  }
-  permissions: Array<{
-    id: string
-    name: string
-    nameAr: string
-    resource: string
-    action: string
-  }>
+interface StatCard {
+  title: string
+  value: string | number
+  change: number
+  icon: any
+  color: string
 }
 
+// بيانات تجريبية للرسوم البيانية
+const activityData = [
+  { name: 'الأحد', views: 4000, articles: 24, users: 240 },
+  { name: 'الإثنين', views: 3000, articles: 18, users: 221 },
+  { name: 'الثلاثاء', views: 2000, articles: 28, users: 229 },
+  { name: 'الأربعاء', views: 2780, articles: 39, users: 200 },
+  { name: 'الخميس', views: 1890, articles: 48, users: 218 },
+  { name: 'الجمعة', views: 2390, articles: 38, users: 250 },
+  { name: 'السبت', views: 3490, articles: 43, users: 210 },
+]
+
+const categoryData = [
+  { name: 'أخبار محلية', value: 400, color: '#3B82F6' },
+  { name: 'رياضة', value: 300, color: '#10B981' },
+  { name: 'تقنية', value: 200, color: '#8B5CF6' },
+  { name: 'اقتصاد', value: 150, color: '#F59E0B' },
+  { name: 'ثقافة', value: 100, color: '#EF4444' },
+]
+
+const recentActivities = [
+  { id: 1, user: 'أحمد محمد', action: 'نشر مقال جديد', time: 'منذ 5 دقائق', type: 'article' },
+  { id: 2, user: 'سارة أحمد', action: 'علق على مقال', time: 'منذ 12 دقيقة', type: 'comment' },
+  { id: 3, user: 'محمد علي', action: 'سجل دخول جديد', time: 'منذ 23 دقيقة', type: 'login' },
+  { id: 4, user: 'فاطمة خالد', action: 'حدثت ملفها الشخصي', time: 'منذ 45 دقيقة', type: 'profile' },
+]
+
 export default function DashboardPage() {
-  const [showForm, setShowForm] = useState(false)
-  const [refreshKey, setRefreshKey] = useState(0)
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+  const [userInfo, setUserInfo] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState({
+    users: 1202,
+    articles: 342,
+    views: 45600,
+    revenue: 12500
+  })
   const router = useRouter()
 
   useEffect(() => {
-    // جلب معلومات المستخدم من localStorage
+    // جلب معلومات المستخدم
     const userData = localStorage.getItem('user')
     const token = localStorage.getItem('token')
     
@@ -44,15 +101,13 @@ export default function DashboardPage() {
       const user = JSON.parse(userData)
       setUserInfo(user)
       
-      // التحقق من صلاحية الوصول للوحة التحكم
-      const hasDashboardAccess = user.permissions?.some(
-        (p: any) => p.resource === 'dashboard' && p.action === 'access'
-      )
-      
-      if (!hasDashboardAccess) {
-        alert('ليس لديك صلاحية الوصول للوحة التحكم')
-        router.push('/')
-      }
+      // إحصائيات وهمية للعرض
+      setStats({
+        users: 1202,
+        articles: 342,
+        views: 45600,
+        revenue: 12500
+      })
     } catch (error) {
       console.error('خطأ في قراءة بيانات المستخدم:', error)
       router.push('/login')
@@ -61,222 +116,230 @@ export default function DashboardPage() {
     }
   }, [router])
 
-  const handleUserAdded = () => {
-    setShowForm(false)
-    setRefreshKey(prev => prev + 1)
-  }
-
-  const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem('token')
-      
-      // استدعاء API تسجيل الخروج
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : ''
-        }
-      })
-
-      if (response.ok) {
-        // حذف البيانات من localStorage
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        
-        // إعادة التوجيه لصفحة تسجيل الدخول مع رسالة النجاح
-        router.push('/login?logout=true')
-      } else {
-        // حتى لو فشل الطلب، نقوم بتسجيل الخروج محلياً
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        router.push('/login?logout=true')
-      }
-    } catch (error) {
-      console.error('خطأ في تسجيل الخروج:', error)
-      // تسجيل خروج محلي في حالة الخطأ
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      router.push('/login?logout=true')
-    }
-  }
-
-  // التحقق من صلاحية إدارة المستخدمين
-  const canManageUsers = userInfo?.permissions?.some(
-    p => p.resource === 'users' && (p.action === 'create' || p.action === 'read')
-  ) || false
-  
-  // التحقق من صلاحية عرض سجلات النشاط
-  const canViewLogs = userInfo?.permissions?.some(
-    p => p.resource === 'system' && p.action === 'view'
-  ) || false
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">جاري التحميل...</div>
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
-      {/* شريط علوي مع زر تسجيل الخروج */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-800">لوحة التحكم - سبق</h1>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
-          >
-            تسجيل الخروج
-          </button>
+    <div className="space-y-6 animate-fade-in">
+      {/* رسالة الترحيب */}
+      <div className="bg-gradient-to-l from-blue-600 to-blue-500 rounded-2xl p-6 text-white shadow-xl">
+        <h1 className="text-3xl font-bold mb-2">
+          مرحباً بك، {userInfo?.name || 'المستخدم'} 👋
+        </h1>
+        <p className="text-blue-100">
+          إليك نظرة عامة على أداء منصتك اليوم
+        </p>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <DashboardCard
+          label="إجمالي المستخدمين"
+          value={stats.users.toLocaleString('ar-SA')}
+          percent={4.1}
+          icon={<Users className="w-6 h-6" />}
+          color="blue"
+        />
+        <DashboardCard
+          label="المقالات المنشورة"
+          value={stats.articles.toLocaleString('ar-SA')}
+          percent={2.7}
+          icon={<FileText className="w-6 h-6" />}
+          color="green"
+        />
+        <DashboardCard
+          label="المشاهدات اليوم"
+          value={stats.views.toLocaleString('ar-SA')}
+          percent={-1.2}
+          icon={<Eye className="w-6 h-6" />}
+          color="purple"
+        />
+        <DashboardCard
+          label="الإيرادات"
+          value={`$${stats.revenue.toLocaleString('ar-SA')}`}
+          percent={8.5}
+          icon={<DollarSign className="w-6 h-6" />}
+          color="orange"
+        />
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Activity Chart */}
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">نشاط المنصة</h3>
+            <select className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option>آخر 7 أيام</option>
+              <option>آخر 30 يوم</option>
+              <option>آخر 3 شهور</option>
+            </select>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={activityData}>
+              <defs>
+                <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip />
+              <Area 
+                type="monotone" 
+                dataKey="views" 
+                stroke="#3B82F6" 
+                fillOpacity={1} 
+                fill="url(#colorViews)" 
+                strokeWidth={2}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Categories Pie Chart */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">توزيع المقالات</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={categoryData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {categoryData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="mt-4 space-y-2">
+            {categoryData.map((category) => (
+              <div key={category.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: category.color }}
+                  />
+                  <span className="text-sm text-gray-600">{category.name}</span>
+                </div>
+                <span className="text-sm font-medium text-gray-900">{category.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="container mx-auto py-8 px-4">
-        {/* معلومات المستخدم الحالي */}
-        <div className="bg-white rounded-lg shadow-md mb-8 p-6">
-          <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-bold">معلومات الحساب</h2>
-            <button
-              onClick={() => router.push('/dashboard/profile')}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm"
-            >
-              تعديل الملف الشخصي
-            </button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-gray-600">الاسم:</p>
-              <p className="font-semibold">{userInfo?.name || 'غير محدد'}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">البريد الإلكتروني:</p>
-              <p className="font-semibold">{userInfo?.email}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">الدور:</p>
-              <p className="font-semibold">{userInfo?.role?.nameAr || userInfo?.role?.name}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">عدد الصلاحيات:</p>
-              <p className="font-semibold">{userInfo?.permissions?.length || 0} صلاحية</p>
-            </div>
-          </div>
-          
-          {/* عرض الصلاحيات */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">الصلاحيات المتاحة:</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-              {userInfo?.permissions && userInfo.permissions.length > 0 ? (
-                userInfo.permissions.map((permission, index) => (
-                  <div 
-                    key={permission.id || `permission-${index}`}
-                    className="bg-gray-100 rounded px-3 py-2 text-sm"
-                  >
-                    <span className="font-semibold">{permission.nameAr}</span>
-                    <span className="text-gray-500 text-xs block">
-                      {permission.resource}.{permission.action}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 col-span-full">لا توجد صلاحيات محددة</p>
-              )}
-            </div>
+      {/* Recent Activities & Top Articles */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activities */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">آخر الأنشطة</h3>
+          <div className="space-y-4">
+            {recentActivities.map((activity) => (
+              <div key={activity.id} className="flex items-start gap-4">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  activity.type === 'article' ? 'bg-blue-100' :
+                  activity.type === 'comment' ? 'bg-green-100' :
+                  activity.type === 'login' ? 'bg-purple-100' :
+                  'bg-orange-100'
+                }`}>
+                  {activity.type === 'article' && <FileText className="w-5 h-5 text-blue-600" />}
+                  {activity.type === 'comment' && <Activity className="w-5 h-5 text-green-600" />}
+                  {activity.type === 'login' && <Users className="w-5 h-5 text-purple-600" />}
+                  {activity.type === 'profile' && <Users className="w-5 h-5 text-orange-600" />}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-900">
+                    <span className="font-medium">{activity.user}</span>
+                    {' '}
+                    {activity.action}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* الروابط السريعة */}
-        <div className="bg-white rounded-lg shadow-md mb-8 p-6">
-          <h2 className="text-xl font-bold mb-4">الروابط السريعة</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <button
-              onClick={() => router.push('/dashboard/profile')}
-              className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow text-right"
-            >
-              <div className="flex items-center space-x-3 space-x-reverse">
-                <div className="bg-blue-100 p-3 rounded-full">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold">الملف الشخصي</h3>
-                  <p className="text-sm text-gray-600">تعديل بياناتك الشخصية</p>
-                </div>
+        {/* Performance Metrics */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">مؤشرات الأداء</h3>
+          <div className="space-y-6">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">معدل النشر اليومي</span>
+                <span className="text-sm font-medium text-gray-900">85%</span>
               </div>
-            </button>
-
-            {canManageUsers && (
-              <button
-                onClick={() => router.push('/dashboard/users')}
-                className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow text-right"
-              >
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <div className="bg-green-100 p-3 rounded-full">
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">إدارة المستخدمين</h3>
-                    <p className="text-sm text-gray-600">إضافة وتعديل المستخدمين</p>
-                  </div>
-                </div>
-              </button>
-            )}
-
-            {canViewLogs && (
-              <button
-                onClick={() => router.push('/dashboard/activity-logs')}
-                className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow text-right"
-              >
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <div className="bg-purple-100 p-3 rounded-full">
-                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">سجل النشاطات</h3>
-                    <p className="text-sm text-gray-600">مراقبة أنشطة النظام</p>
-                  </div>
-                </div>
-              </button>
-            )}
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '85%' }}></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">تفاعل المستخدمين</span>
+                <span className="text-sm font-medium text-gray-900">72%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-green-500 h-2 rounded-full" style={{ width: '72%' }}></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">جودة المحتوى</span>
+                <span className="text-sm font-medium text-gray-900">93%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-purple-500 h-2 rounded-full" style={{ width: '93%' }}></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">سرعة الاستجابة</span>
+                <span className="text-sm font-medium text-gray-900">98%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-orange-500 h-2 rounded-full" style={{ width: '98%' }}></div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* قسم إدارة المستخدمين - يظهر فقط لمن لديه الصلاحية */}
-        {canManageUsers ? (
-          <>
-            <div className="mb-6 text-center">
-              <button
-                onClick={() => setShowForm(!showForm)}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                {showForm ? 'إخفاء النموذج' : 'إضافة مستخدم جديد'}
-              </button>
-            </div>
-
-            {showForm && (
-              <div className="bg-white rounded-lg shadow-md mb-8">
-                <UserForm onSuccess={handleUserAdded} />
+      {/* الروابط السريعة */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { title: 'إضافة مقال', icon: DocumentTextIcon, href: '/dashboard/articles/new', color: 'bg-blue-500' },
+          { title: 'إدارة المستخدمين', icon: UsersIcon, href: '/dashboard/users', color: 'bg-green-500' },
+          { title: 'الإحصائيات', icon: ChartBarIcon, href: '/dashboard/analytics', color: 'bg-purple-500' },
+          { title: 'الإعدادات', icon: CogIcon, href: '/dashboard/settings', color: 'bg-gray-500' },
+        ].map((link, index) => {
+          const Icon = link.icon
+          return (
+            <button
+              key={index}
+              onClick={() => router.push(link.href)}
+              className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-center group"
+            >
+              <div className={`${link.color} w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+                <Icon className="w-6 h-6 text-white" />
               </div>
-            )}
-
-            <div className="bg-white rounded-lg shadow-md">
-              <UserList key={refreshKey} />
-            </div>
-          </>
-        ) : (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-            <p className="text-yellow-800">
-              ليس لديك صلاحية إدارة المستخدمين. يمكنك فقط عرض معلومات حسابك.
-            </p>
-          </div>
-        )}
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{link.title}</p>
+            </button>
+          )
+        })}
       </div>
     </div>
   )
