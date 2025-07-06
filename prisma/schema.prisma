@@ -7,81 +7,101 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// جدول المستخدمين
 model sabq_users {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
-  roleId    String?  @default("user-role-id")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // العلاقات
-  role      sabq_roles? @relation(fields: [roleId], references: [id])
-  sessions  sabq_sessions[]
+  id                  String                       @id @default(cuid())
+  email               String                       @unique
+  password            String
+  name                String?
+  roleId              String?
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  activityLogs        sabq_activity_logs[]
+  passwordResetTokens sabq_password_reset_tokens[]
+  sessions            sabq_sessions[]
+  role                sabq_roles?                  @relation(fields: [roleId], references: [id])
+
+  @@index([email])
+  @@index([roleId])
 }
 
-// جدول الأدوار
 model sabq_roles {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  nameAr      String   // الاسم بالعربية
+  id          String                  @id @default(uuid())
+  name        String                  @unique
+  nameAr      String
   description String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // العلاقات
-  users       sabq_users[]
+  isActive    Boolean                 @default(true)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
   permissions sabq_role_permissions[]
+  users       sabq_users[]
 }
 
-// جدول الصلاحيات
 model sabq_permissions {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  nameAr      String   // الاسم بالعربية
-  resource    String   // المورد (articles, users, etc)
-  action      String   // الإجراء (create, read, update, delete)
+  id          String                  @id @default(uuid())
+  name        String                  @unique
+  nameAr      String
+  resource    String
+  action      String
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // العلاقات
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
   roles       sabq_role_permissions[]
-  
+
   @@unique([resource, action])
 }
 
-// جدول ربط الأدوار بالصلاحيات
 model sabq_role_permissions {
-  id           String   @id @default(uuid())
+  id           String           @id @default(uuid())
   roleId       String
   permissionId String
-  createdAt    DateTime @default(now())
-  
-  // العلاقات
-  role         sabq_roles       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt    DateTime         @default(now())
   permission   sabq_permissions @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  
+  role         sabq_roles       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
   @@unique([roleId, permissionId])
 }
 
-// جدول الجلسات (للأمان المتقدم)
 model sabq_sessions {
-  id        String   @id @default(uuid())
+  id        String     @id @default(cuid())
   userId    String
-  token     String   @unique
+  token     String     @unique
   ipAddress String?
   userAgent String?
   expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // العلاقات
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   user      sabq_users @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([expiresAt])
+}
+
+model sabq_password_reset_tokens {
+  id        String     @id @default(cuid())
+  userId    String
+  token     String     @unique
+  expiresAt DateTime
+  createdAt DateTime   @default(now())
+  used      Boolean    @default(false)
+  user      sabq_users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model sabq_activity_logs {
+  id         String      @id @default(cuid())
+  userId     String?
+  action     String
+  resource   String?
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime    @default(now())
+  user       sabq_users? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
 }

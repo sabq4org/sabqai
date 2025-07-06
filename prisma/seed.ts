@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -72,6 +72,7 @@ async function main() {
     // صلاحيات النظام
     { name: 'system.settings', nameAr: 'إعدادات النظام', resource: 'system', action: 'settings' },
     { name: 'system.logs', nameAr: 'عرض السجلات', resource: 'system', action: 'logs' },
+    { name: 'system.view', nameAr: 'عرض سجلات النشاط', resource: 'system', action: 'view' },
   ]
 
   for (const perm of permissions) {

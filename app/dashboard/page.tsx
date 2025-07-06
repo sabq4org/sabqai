@@ -104,6 +104,11 @@ export default function DashboardPage() {
   const canManageUsers = userInfo?.permissions?.some(
     p => p.resource === 'users' && (p.action === 'create' || p.action === 'read')
   ) || false
+  
+  // التحقق من صلاحية عرض سجلات النشاط
+  const canViewLogs = userInfo?.permissions?.some(
+    p => p.resource === 'system' && p.action === 'view'
+  ) || false
 
   if (loading) {
     return (
@@ -163,18 +168,83 @@ export default function DashboardPage() {
           <div className="mt-6">
             <h3 className="text-lg font-semibold mb-3">الصلاحيات المتاحة:</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-              {userInfo?.permissions?.map((permission) => (
-                <div 
-                  key={permission.id}
-                  className="bg-gray-100 rounded px-3 py-2 text-sm"
-                >
-                  <span className="font-semibold">{permission.nameAr}</span>
-                  <span className="text-gray-500 text-xs block">
-                    {permission.resource}.{permission.action}
-                  </span>
-                </div>
-              ))}
+              {userInfo?.permissions && userInfo.permissions.length > 0 ? (
+                userInfo.permissions.map((permission, index) => (
+                  <div 
+                    key={permission.id || `permission-${index}`}
+                    className="bg-gray-100 rounded px-3 py-2 text-sm"
+                  >
+                    <span className="font-semibold">{permission.nameAr}</span>
+                    <span className="text-gray-500 text-xs block">
+                      {permission.resource}.{permission.action}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 col-span-full">لا توجد صلاحيات محددة</p>
+              )}
             </div>
+          </div>
+        </div>
+
+        {/* الروابط السريعة */}
+        <div className="bg-white rounded-lg shadow-md mb-8 p-6">
+          <h2 className="text-xl font-bold mb-4">الروابط السريعة</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <button
+              onClick={() => router.push('/dashboard/profile')}
+              className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow text-right"
+            >
+              <div className="flex items-center space-x-3 space-x-reverse">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold">الملف الشخصي</h3>
+                  <p className="text-sm text-gray-600">تعديل بياناتك الشخصية</p>
+                </div>
+              </div>
+            </button>
+
+            {canManageUsers && (
+              <button
+                onClick={() => router.push('/dashboard/users')}
+                className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow text-right"
+              >
+                <div className="flex items-center space-x-3 space-x-reverse">
+                  <div className="bg-green-100 p-3 rounded-full">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">إدارة المستخدمين</h3>
+                    <p className="text-sm text-gray-600">إضافة وتعديل المستخدمين</p>
+                  </div>
+                </div>
+              </button>
+            )}
+
+            {canViewLogs && (
+              <button
+                onClick={() => router.push('/dashboard/activity-logs')}
+                className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow text-right"
+              >
+                <div className="flex items-center space-x-3 space-x-reverse">
+                  <div className="bg-purple-100 p-3 rounded-full">
+                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">سجل النشاطات</h3>
+                    <p className="text-sm text-gray-600">مراقبة أنشطة النظام</p>
+                  </div>
+                </div>
+              </button>
+            )}
           </div>
         </div>
 

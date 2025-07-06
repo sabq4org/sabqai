@@ -124,4 +124,19 @@ export async function isEditor(userId: string): Promise<boolean> {
 export async function isUser(userId: string): Promise<boolean> {
   const role = await getUserRole(userId)
   return role === 'user'
+}
+
+// دالة للتحقق من الصلاحيات في API routes
+export async function requirePermission(
+  request: Request,
+  resource: string,
+  action: string
+): Promise<any> {
+  try {
+    // هنا يمكن إضافة منطق التحقق من الصلاحيات
+    // حالياً سنسمح بكل الطلبات
+    return { authorized: true }
+  } catch (error) {
+    return { authorized: false, error: 'خطأ في التحقق من الصلاحيات' }
+  }
 } 

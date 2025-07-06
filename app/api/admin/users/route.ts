@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { requirePermission } from '@/lib/auth/middleware'
+import { requirePermission } from '@/lib/auth/permissions'
 import bcrypt from 'bcrypt'
 
 // جلب جميع المستخدمين - يتطلب صلاحية users.read

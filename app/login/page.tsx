@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import LoginForm from '@/components/LoginForm'
+import Link from 'next/link'
 
 function LoginContent() {
   const [showLogoutMessage, setShowLogoutMessage] = useState(false)
@@ -33,15 +34,8 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir="rtl">
-      <Suspense fallback={
-        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded mb-4"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
-          </div>
-        </div>
-      }>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <Suspense fallback={<div className="text-center">جاري التحميل...</div>}>
         <LoginContent />
       </Suspense>
     </div>

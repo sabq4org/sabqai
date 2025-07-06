@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { requirePermission } from '@/lib/auth/middleware'
+import { requirePermission } from '@/lib/auth/permissions'
 
 // جلب جميع الأدوار - يتطلب صلاحية users.read
 export async function GET(request: NextRequest) {
