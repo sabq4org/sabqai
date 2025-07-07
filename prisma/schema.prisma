@@ -13,12 +13,18 @@ model sabq_users {
   password            String
   name                String?
   roleId              String?
+  lastLoginAt         DateTime?
+  isActive            Boolean                      @default(true)
   createdAt           DateTime                     @default(now())
   updatedAt           DateTime                     @updatedAt
   activityLogs        sabq_activity_logs[]
   passwordResetTokens sabq_password_reset_tokens[]
   sessions            sabq_sessions[]
   role                sabq_roles?                  @relation(fields: [roleId], references: [id])
+  articles            sabq_articles[]
+  comments            sabq_comments[]
+  likes               sabq_likes[]
+  articleViews        sabq_article_views[]
 
   @@index([email])
   @@index([roleId])
@@ -107,21 +113,103 @@ model sabq_activity_logs {
 }
 
 model sabq_categories {
-  id            String   @id @default(uuid())
+  id            String         @id @default(uuid())
   name          String
   name_en       String?
-  slug          String   @unique
+  slug          String         @unique
   description   String?
   color         String?
   icon          String?
-  display_order Int      @default(0)
-  is_active     Boolean  @default(true)
+  display_order Int            @default(0)
+  is_active     Boolean        @default(true)
   parent_id     String?
   metadata      Json?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+  articles      sabq_articles[]
 
   @@index([slug])
   @@index([is_active])
   @@index([display_order])
+}
+
+model sabq_articles {
+  id            String           @id @default(uuid())
+  title         String
+  slug          String           @unique
+  content       String           @db.Text
+  excerpt       String?
+  featuredImage String?
+  status        String           @default("draft") // draft, published, archived, deleted
+  isPinned      Boolean          @default(false)
+  tags          String[]
+  viewCount     Int              @default(0)
+  authorId      String
+  categoryId    String
+  publishedAt   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  
+  author        sabq_users       @relation(fields: [authorId], references: [id])
+  category      sabq_categories  @relation(fields: [categoryId], references: [id])
+  comments      sabq_comments[]
+  likes         sabq_likes[]
+  views         sabq_article_views[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([publishedAt])
+  @@index([isPinned])
+}
+
+model sabq_comments {
+  id        String        @id @default(uuid())
+  content   String        @db.Text
+  articleId String
+  userId    String
+  parentId  String?
+  status    String        @default("pending") // pending, approved, rejected, deleted
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  
+  article   sabq_articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user      sabq_users    @relation(fields: [userId], references: [id])
+  parent    sabq_comments? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   sabq_comments[] @relation("CommentReplies")
+
+  @@index([articleId])
+  @@index([userId])
+  @@index([status])
+}
+
+model sabq_likes {
+  id        String        @id @default(uuid())
+  articleId String
+  userId    String
+  createdAt DateTime      @default(now())
+  
+  article   sabq_articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user      sabq_users    @relation(fields: [userId], references: [id])
+
+  @@unique([articleId, userId])
+  @@index([articleId])
+  @@index([userId])
+}
+
+model sabq_article_views {
+  id        String        @id @default(uuid())
+  articleId String
+  userId    String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime      @default(now())
+  
+  article   sabq_articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user      sabq_users?   @relation(fields: [userId], references: [id])
+
+  @@index([articleId])
+  @@index([userId])
+  @@index([createdAt])
 }

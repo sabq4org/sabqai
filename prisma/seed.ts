@@ -198,6 +198,114 @@ async function main() {
   })
 
   console.log('✅ تم إنشاء المستخدمين التجريبيين')
+
+  // 5. إنشاء التصنيفات
+  const categories = [
+    { name: 'محلي', name_en: 'Local', slug: 'local', color: '#DC2626', icon: '🏛️', display_order: 1 },
+    { name: 'اقتصاد', name_en: 'Economy', slug: 'economy', color: '#F59E0B', icon: '💰', display_order: 2 },
+    { name: 'رياضة', name_en: 'Sports', slug: 'sports', color: '#10B981', icon: '⚽', display_order: 3 },
+    { name: 'تقنية', name_en: 'Tech', slug: 'tech', color: '#3B82F6', icon: '💻', display_order: 4 },
+    { name: 'ثقافة', name_en: 'Culture', slug: 'culture', color: '#8B5CF6', icon: '🎭', display_order: 5 },
+    { name: 'صحة', name_en: 'Health', slug: 'health', color: '#EC4899', icon: '🏥', display_order: 6 },
+    { name: 'تعليم', name_en: 'Education', slug: 'education', color: '#6366F1', icon: '📚', display_order: 7 },
+    { name: 'سياحة', name_en: 'Tourism', slug: 'tourism', color: '#14B8A6', icon: '✈️', display_order: 8 },
+  ]
+
+  const createdCategories = []
+  for (const cat of categories) {
+    const category = await prisma.sabq_categories.upsert({
+      where: { slug: cat.slug },
+      update: {},
+      create: cat
+    })
+    createdCategories.push(category)
+  }
+
+  console.log('✅ تم إنشاء التصنيفات')
+
+  // 6. إنشاء مقالات تجريبية
+  const admin = await prisma.sabq_users.findFirst({ where: { email: 'admin@sabq.ai' } })
+  const editor = await prisma.sabq_users.findFirst({ where: { email: 'editor@sabq.ai' } })
+
+  if (admin && editor) {
+    const articles = [
+      {
+        title: 'المملكة تستضيف قمة الذكاء الاصطناعي العالمية 2025',
+        slug: 'saudi-hosts-ai-summit-2025',
+        content: `تستعد المملكة العربية السعودية لاستضافة أكبر حدث عالمي للذكاء الاصطناعي في الشرق الأوسط...`,
+        excerpt: 'تستعد المملكة العربية السعودية لاستضافة أكبر حدث عالمي للذكاء الاصطناعي في الشرق الأوسط، بمشاركة أبرز الخبراء والشركات العالمية.',
+        featuredImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995',
+        status: 'published',
+        isPinned: true,
+        tags: ['ai-generated', 'technology', 'saudi'],
+        viewCount: 1250,
+        authorId: admin.id,
+        categoryId: createdCategories.find(c => c.slug === 'tech')!.id,
+        publishedAt: new Date()
+      },
+      {
+        title: 'نمو الاقتصاد السعودي يتجاوز التوقعات في الربع الأول',
+        slug: 'saudi-economy-growth-q1',
+        content: `سجل الاقتصاد السعودي نمواً قوياً في الربع الأول من العام الحالي...`,
+        excerpt: 'سجل الاقتصاد السعودي نمواً قوياً يتجاوز التوقعات بنسبة 5.9% في الربع الأول.',
+        featuredImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3',
+        status: 'published',
+        tags: ['economy', 'saudi', 'growth'],
+        viewCount: 850,
+        authorId: editor.id,
+        categoryId: createdCategories.find(c => c.slug === 'economy')!.id,
+        publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 2) // قبل ساعتين
+      },
+      {
+        title: 'الهلال يتوج بطلاً لدوري روشن السعودي للمحترفين',
+        slug: 'alhilal-wins-saudi-league',
+        content: `توج نادي الهلال بطلاً لدوري روشن السعودي للمحترفين للموسم الحالي...`,
+        excerpt: 'توج نادي الهلال بطلاً لدوري روشن السعودي بعد فوزه الكبير في المباراة الحاسمة.',
+        featuredImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018',
+        status: 'published',
+        tags: ['sports', 'football', 'saudi-league'],
+        viewCount: 2100,
+        authorId: editor.id,
+        categoryId: createdCategories.find(c => c.slug === 'sports')!.id,
+        publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 5) // قبل 5 ساعات
+      },
+      {
+        title: 'افتتاح أكبر مستشفى متخصص في علاج السرطان بالرياض',
+        slug: 'new-cancer-hospital-riyadh',
+        content: `افتتحت وزارة الصحة أكبر مستشفى متخصص في علاج السرطان في العاصمة الرياض...`,
+        excerpt: 'افتتاح أكبر مستشفى متخصص في علاج السرطان بالرياض بسعة 500 سرير.',
+        featuredImage: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d',
+        status: 'published',
+        tags: ['health', 'medical', 'riyadh'],
+        viewCount: 670,
+        authorId: admin.id,
+        categoryId: createdCategories.find(c => c.slug === 'health')!.id,
+        publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 8) // قبل 8 ساعات
+      },
+      {
+        title: 'موسم الرياض 2025 يستقبل 20 مليون زائر',
+        slug: 'riyadh-season-2025-visitors',
+        content: `أعلنت الهيئة العامة للترفيه عن وصول عدد زوار موسم الرياض إلى 20 مليون زائر...`,
+        excerpt: 'موسم الرياض 2025 يحطم الأرقام القياسية باستقبال 20 مليون زائر من مختلف أنحاء العالم.',
+        featuredImage: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3',
+        status: 'published',
+        tags: ['tourism', 'entertainment', 'riyadh-season'],
+        viewCount: 1500,
+        authorId: editor.id,
+        categoryId: createdCategories.find(c => c.slug === 'tourism')!.id,
+        publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24) // قبل يوم
+      }
+    ]
+
+    for (const articleData of articles) {
+      await prisma.sabq_articles.create({
+        data: articleData
+      })
+    }
+
+    console.log('✅ تم إنشاء المقالات التجريبية')
+  }
+
   console.log('🎉 اكتملت عملية البذر بنجاح!')
 }
 
