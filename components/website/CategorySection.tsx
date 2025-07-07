@@ -38,16 +38,14 @@ interface CategorySectionProps {
 export default function CategorySection({ category, articles, showMore = true }: CategorySectionProps) {
   // Category Icons mapping
   const categoryIcons: { [key: string]: string } = {
-    'محلي': '🏛️',
-    'اقتصاد': '💰',
-    'رياضة': '⚽',
     'تقنية': '💻',
-    'ثقافة': '🎭',
-    'صحة': '🏥',
-    'تعليم': '📚',
-    'سياحة': '✈️',
-    'سيارات': '🚗',
-    'أسواق': '📊',
+    'رياضة': '⚽',
+    'اقتصاد': '💰',
+    'سياسة': '🏛️',
+    'محليات': '🗺️',
+    'ثقافة ومجتمع': '🎭',
+    'مقالات رأي': '✍️',
+    'منوعات': '🎉',
   }
 
   return (
@@ -117,52 +115,59 @@ interface CategoriesGridProps {
 
 export function CategoriesGrid({ categories }: CategoriesGridProps) {
   const categoryIcons: { [key: string]: string } = {
-    'محلي': '🏛️',
-    'اقتصاد': '💰',
-    'رياضة': '⚽',
     'تقنية': '💻',
-    'ثقافة': '🎭',
-    'صحة': '🏥',
-    'تعليم': '📚',
-    'سياحة': '✈️',
-    'سيارات': '🚗',
-    'أسواق': '📊',
+    'رياضة': '⚽',
+    'اقتصاد': '💰',
+    'سياسة': '🏛️',
+    'محليات': '🗺️',
+    'ثقافة ومجتمع': '🎭',
+    'مقالات رأي': '✍️',
+    'منوعات': '🎉',
   }
 
   return (
-    <section className="py-12 bg-gray-50 dark:bg-gray-900">
+    <section className="py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center">
-          تصفح الأقسام
-        </h2>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              href={`/category/${category.slug}`}
-              className="group"
-            >
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300 group-hover:scale-105">
-                <div 
-                  className="w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-3"
-                  style={{ backgroundColor: category.color || '#3B82F6' }}
-                >
-                  <span className="filter grayscale-0 brightness-0 invert">
-                    {category.icon || categoryIcons[category.name] || '📰'}
-                  </span>
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 shadow-sm">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              تصفح الأخبار حسب اهتمامك
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              اختر القسم المفضل لديك
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/category/${category.slug}`}
+                className="group"
+              >
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-xl p-3 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 hover:shadow-md">
+                  <div className="flex items-center gap-3">
+                    {/* Icon */}
+                    <span className="text-2xl">
+                      {category.icon || categoryIcons[category.name] || '📰'}
+                    </span>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 text-sm">
+                        {category.name}
+                      </h3>
+                      {category.articleCount !== undefined && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {category.articleCount} مقال
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                  {category.name}
-                </h3>
-                {category.articleCount !== undefined && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {category.articleCount} مقال
-                  </p>
-                )}
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>

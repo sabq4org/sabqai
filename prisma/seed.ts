@@ -201,14 +201,78 @@ async function main() {
 
   // 5. إنشاء التصنيفات
   const categories = [
-    { name: 'محلي', name_en: 'Local', slug: 'local', color: '#DC2626', icon: '🏛️', display_order: 1 },
-    { name: 'اقتصاد', name_en: 'Economy', slug: 'economy', color: '#F59E0B', icon: '💰', display_order: 2 },
-    { name: 'رياضة', name_en: 'Sports', slug: 'sports', color: '#10B981', icon: '⚽', display_order: 3 },
-    { name: 'تقنية', name_en: 'Tech', slug: 'tech', color: '#3B82F6', icon: '💻', display_order: 4 },
-    { name: 'ثقافة', name_en: 'Culture', slug: 'culture', color: '#8B5CF6', icon: '🎭', display_order: 5 },
-    { name: 'صحة', name_en: 'Health', slug: 'health', color: '#EC4899', icon: '🏥', display_order: 6 },
-    { name: 'تعليم', name_en: 'Education', slug: 'education', color: '#6366F1', icon: '📚', display_order: 7 },
-    { name: 'سياحة', name_en: 'Tourism', slug: 'tourism', color: '#14B8A6', icon: '✈️', display_order: 8 },
+    { 
+      name: 'تقنية', 
+      name_en: 'Technology', 
+      description: 'أخبار وتطورات التقنية والذكاء الاصطناعي',
+      slug: 'technology', 
+      color: '#8B5CF6', 
+      icon: '💻', 
+      display_order: 1 
+    },
+    { 
+      name: 'رياضة', 
+      name_en: 'Sports', 
+      description: 'أخبار رياضية محلية وعالمية',
+      slug: 'sports', 
+      color: '#F59E0B', 
+      icon: '⚽', 
+      display_order: 2 
+    },
+    { 
+      name: 'اقتصاد', 
+      name_en: 'Economy', 
+      description: 'تقارير السوق والمال والأعمال والطاقة',
+      slug: 'economy', 
+      color: '#10B981', 
+      icon: '💰', 
+      display_order: 3 
+    },
+    { 
+      name: 'سياسة', 
+      name_en: 'Politics', 
+      description: 'مستجدات السياسة المحلية والدولية وتحليلاتها',
+      slug: 'politics', 
+      color: '#EF4444', 
+      icon: '🏛️', 
+      display_order: 4 
+    },
+    { 
+      name: 'محليات', 
+      name_en: 'Local', 
+      description: 'أخبار المناطق والمدن السعودية',
+      slug: 'local', 
+      color: '#3B82F6', 
+      icon: '🗺️', 
+      display_order: 5 
+    },
+    { 
+      name: 'ثقافة ومجتمع', 
+      name_en: 'Culture', 
+      description: 'فعاليات ثقافية، مناسبات، قضايا اجتماعية',
+      slug: 'culture', 
+      color: '#EC4899', 
+      icon: '🎭', 
+      display_order: 6 
+    },
+    { 
+      name: 'مقالات رأي', 
+      name_en: 'Opinion', 
+      description: 'تحليلات ووجهات نظر كتاب الرأي',
+      slug: 'opinion', 
+      color: '#7C3AED', 
+      icon: '✍️', 
+      display_order: 7 
+    },
+    { 
+      name: 'منوعات', 
+      name_en: 'Misc', 
+      description: 'أخبار خفيفة، لقطات، طرائف وأحداث غير تقليدية',
+      slug: 'misc', 
+      color: '#6B7280', 
+      icon: '🎉', 
+      display_order: 8 
+    }
   ]
 
   const createdCategories = []
@@ -240,7 +304,7 @@ async function main() {
         tags: ['ai-generated', 'technology', 'saudi'],
         viewCount: 1250,
         authorId: admin.id,
-        categoryId: createdCategories.find(c => c.slug === 'tech')!.id,
+        categoryId: createdCategories.find(c => c.slug === 'technology')!.id,
         publishedAt: new Date()
       },
       {
@@ -279,7 +343,7 @@ async function main() {
         tags: ['health', 'medical', 'riyadh'],
         viewCount: 670,
         authorId: admin.id,
-        categoryId: createdCategories.find(c => c.slug === 'health')!.id,
+        categoryId: createdCategories.find(c => c.slug === 'local')!.id,
         publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 8) // قبل 8 ساعات
       },
       {
@@ -292,7 +356,7 @@ async function main() {
         tags: ['tourism', 'entertainment', 'riyadh-season'],
         viewCount: 1500,
         authorId: editor.id,
-        categoryId: createdCategories.find(c => c.slug === 'tourism')!.id,
+        categoryId: createdCategories.find(c => c.slug === 'culture')!.id,
         publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24) // قبل يوم
       }
     ]

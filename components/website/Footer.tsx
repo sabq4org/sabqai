@@ -9,11 +9,11 @@ const navigation = {
     { name: 'الإعلانات', href: '/advertising' },
   ],
   categories: [
-    { name: 'محلي', href: '/category/local' },
-    { name: 'اقتصاد', href: '/category/economy' },
+    { name: 'تقنية', href: '/category/technology' },
     { name: 'رياضة', href: '/category/sports' },
-    { name: 'تقنية', href: '/category/tech' },
-    { name: 'ثقافة', href: '/category/culture' },
+    { name: 'اقتصاد', href: '/category/economy' },
+    { name: 'سياسة', href: '/category/politics' },
+    { name: 'محليات', href: '/category/local' },
   ],
   services: [
     { name: 'النشرة البريدية', href: '/newsletter' },

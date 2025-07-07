@@ -1,7 +1,8 @@
 import ClientLayout from '@/components/website/ClientLayout'
 import HeroSection from '@/components/website/HeroSection'
 import NewsCard from '@/components/website/NewsCard'
-import CategorySection, { CategoriesGrid } from '@/components/website/CategorySection'
+import CategorySection from '@/components/website/CategorySection'
+import InteractiveCategoriesSection from '@/components/website/InteractiveCategoriesSection'
 import { ChevronLeftIcon, FireIcon, ChartBarIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 
@@ -57,6 +58,9 @@ export default async function HomePage() {
         <main>
           {/* Hero Section */}
           <HeroSection featuredArticle={featuredArticle[0]} />
+
+          {/* Interactive Categories Section */}
+          <InteractiveCategoriesSection categories={categories} initialArticles={latestArticles} />
 
           {/* Latest News Section */}
           <section className="py-12 bg-white dark:bg-gray-800">
@@ -126,11 +130,6 @@ export default async function HomePage() {
               articles={category.articles}
             />
           ))}
-
-          {/* All Categories Grid */}
-          {categories.length > 0 && (
-            <CategoriesGrid categories={categories} />
-          )}
         </main>
       </ClientLayout>
     </div>

@@ -83,6 +83,9 @@ export default function CategoriesPage() {
       label: 'الاسم',
       render: (value: any, category: Category) => (
         <div className="flex items-center gap-2">
+          {category.icon && (
+            <span className="text-2xl">{category.icon}</span>
+          )}
           {category.color && (
             <div 
               className="w-4 h-4 rounded-full"
@@ -367,6 +370,20 @@ function CategoryModal({
                   ))
                 }
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                الأيقونة (إيموجي)
+              </label>
+              <input
+                type="text"
+                value={formData.icon}
+                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white text-2xl text-center"
+                placeholder="🏆"
+                maxLength={2}
+              />
             </div>
 
             <div>

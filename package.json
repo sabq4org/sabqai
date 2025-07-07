@@ -10,7 +10,8 @@
     "postinstall": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:seed": "tsx prisma/seed.ts",
-    "prisma:push": "prisma db push"
+    "prisma:push": "prisma db push",
+    "update:categories": "tsx scripts/update-categories.ts"
   },
   "engines": {
     "node": "18.x || 20.x || 22.x"
