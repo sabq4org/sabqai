@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import NewsCard from './NewsCard'
-import { ChevronRightIcon } from '@heroicons/react/24/outline'
+import { ChevronRightIcon, XMarkIcon, TagIcon } from '@heroicons/react/24/outline'
 
 interface Category {
   id: string
@@ -82,97 +82,110 @@ export default function InteractiveCategoriesSection({ categories, initialArticl
   }
 
   return (
-    <section className="py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-br from-blue-50/80 to-blue-100/40 dark:from-gray-800/90 dark:to-gray-900/90 rounded-3xl p-6 md:p-8 shadow-sm">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              تصفح الأخبار حسب اهتمامك
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              اختر القسم لعرض آخر الأخبار
-            </p>
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 mb-8">
+      <div 
+        className="rounded-3xl p-4 sm:p-6 lg:p-8 transition-all duration-500 shadow-lg dark:shadow-gray-900/50 bg-blue-50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/30"
+        style={{ 
+          backdropFilter: 'blur(10px)',
+          background: 'linear-gradient(135deg, rgba(219, 234, 254, 0.5) 0%, rgba(191, 219, 254, 0.3) 100%)'
+        }}
+      >
+        {/* Header */}
+        <div className="text-center mb-6 sm:mb-8">
+          {/* أيقونة كبيرة وواضحة */}
+          <div className="mb-4">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-2xl flex items-center justify-center shadow-xl bg-gradient-to-br from-blue-500 to-blue-700">
+              <TagIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+            </div>
           </div>
           
-          {/* Categories */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-3 mb-8">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => handleCategoryClick(category.slug)}
-                className={`
-                  group relative overflow-hidden rounded-xl p-3 transition-all duration-200
-                  ${selectedCategory === category.slug 
-                    ? 'bg-white dark:bg-gray-700 shadow-lg ring-2 ring-blue-500' 
-                    : 'bg-white/60 dark:bg-gray-700/60 hover:bg-white dark:hover:bg-gray-700 hover:shadow-md'
-                  }
-                `}
-              >
-                <div className="flex flex-col items-center gap-2">
-                  <span className="text-2xl">
-                    {category.icon || categoryIcons[category.name] || '📰'}
-                  </span>
-                  <span className="text-xs md:text-sm font-medium text-gray-900 dark:text-white">
-                    {category.name}
-                  </span>
-                  {category.articleCount !== undefined && (
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {category.articleCount}
-                    </span>
-                  )}
-                </div>
-                
-                {/* Active indicator */}
-                {selectedCategory === category.slug && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500" />
-                )}
-              </button>
-            ))}
-          </div>
+          {/* العنوان */}
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 text-gray-800 dark:text-white">
+            استكشف بحسب التصنيفات
+          </h2>
+          
+          {/* الوصف */}
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            اختر التصنيف الذي يهمك لتصفح الأخبار المتخصصة
+          </p>
+        </div>
 
-          {/* Articles */}
-          {selectedCategory && (
-            <div className="border-t border-blue-200/50 dark:border-gray-700/50 pt-8">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  آخر أخبار {categories.find(c => c.slug === selectedCategory)?.name}
-                </h3>
-                <Link 
-                  href={`/category/${selectedCategory}`}
-                  className="flex items-center gap-1 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm"
-                >
-                  عرض الكل
-                  <ChevronRightIcon className="h-4 w-4" />
-                </Link>
+        {/* Categories */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => handleCategoryClick(category.slug)}
+              className={`
+                group px-3 py-2 sm:px-4 md:px-6 sm:py-3 rounded-xl font-medium text-xs sm:text-sm transition-all duration-300 transform hover:scale-105 relative
+                ${selectedCategory === category.slug 
+                  ? 'bg-blue-500 text-white border-2 border-blue-400 shadow-lg' 
+                  : 'bg-white dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-blue-600 border border-blue-200/50 dark:border-gray-700/30 hover:border-blue-300 shadow-sm hover:shadow-lg backdrop-blur-sm'
+                }
+              `}
+            >
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-sm sm:text-lg group-hover:scale-110 transition-transform duration-300">
+                  {category.icon || categoryIcons[category.name] || '📰'}
+                </span>
+                <span className="whitespace-nowrap">{category.name}</span>
+                <span className={`text-xs ${selectedCategory === category.slug ? 'text-white/90' : 'text-gray-500 dark:text-gray-400 opacity-60'}`}>
+                  ({category.articleCount || 0})
+                </span>
               </div>
+            </button>
+          ))}
+        </div>
 
-              {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="animate-pulse">
-                      <div className="bg-gray-200 dark:bg-gray-700 rounded-xl h-48 mb-4"></div>
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
-                    </div>
-                  ))}
-                </div>
-              ) : articles.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* عرض المقالات المرتبطة بالتصنيف المختار */}
+        {selectedCategory && (
+          <div className="mt-8 p-6 rounded-3xl shadow-lg bg-white dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-white">
+                مقالات {categories.find(c => c.slug === selectedCategory)?.name}
+              </h3>
+              <button
+                onClick={() => {
+                  setSelectedCategory(null)
+                  setArticles([])
+                }}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <XMarkIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+              </div>
+            ) : articles.length > 0 ? (
+              <>
+                {/* Grid Layout for Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                   {articles.slice(0, 8).map((article) => (
                     <NewsCard key={article.id} article={article} />
                   ))}
                 </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 dark:text-gray-400">
-                    لا توجد أخبار في هذا القسم حالياً
-                  </p>
+                
+                {/* زر عرض جميع المقالات */}
+                <div className="text-center mt-8">
+                  <Link 
+                    href={`/category/${selectedCategory}`}
+                    className="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-bold text-base transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white"
+                  >
+                    <span>عرض جميع مقالات {categories.find(c => c.slug === selectedCategory)?.name}</span>
+                    <ChevronRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>لا توجد مقالات منشورة في هذا التصنيف حالياً</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   )
